@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+blocked_apps.json
+build
+data
