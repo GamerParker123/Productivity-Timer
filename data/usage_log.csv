@@ -1,3 +1,5 @@
 timestamp_start,timestamp_end,duration_secs,app_name,window_title,phase
 2025-08-23 23:09:12,2025-08-23 23:09:13,1,Code.exe,● .gitignore - 5217Timer - Visual Studio Code,work
-2025-08-23 23:09:13,2025-08-23 23:09:14,1,python.exe,Figure 1,work
+2025-08-23 23:09:13,2025-08-23 23:13:56,3,python.exe,Figure 1,work
+2025-08-23 23:13:53,2025-08-23 23:13:54,1,Code.exe,.gitignore - 5217Timer - Visual Studio Code,work
+2025-08-23 23:13:56,2025-08-23 23:14:15,19,python.exe,Pomodoro Tracker,work
