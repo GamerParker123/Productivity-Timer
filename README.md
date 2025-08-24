@@ -1,4 +1,4 @@
-Pomodoro Tracker with App Blocking
+**Pomodoro Tracker with App Blocking**
 
 A Python-based Pomodoro timer with extended productivity features, including app blocking, active window tracking, and usage visualization. Built using Tkinter, psutil, and matplotlib.
 
