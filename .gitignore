@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 blocked_apps.json
 data
-build/main
+build
