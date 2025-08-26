@@ -35,10 +35,7 @@ def block_apps_loop(stop_event, root):
         enforce_blocked_apps(root)
         time.sleep(1)
 
-# TODO: Make work and break times changeable
-# TODO: Give a couple hours of surplus overtime every day (for unavoidable breaks like eating dinner or to give some extra break time if needed)
-# TODO: Generate a summary every day/week that tells you what you spent the most time on app-wise and what you did for each hour of the day
-# TODO: If time permits, add a way to block out certain apps if overtime is negative, during work time, or during specific hours of the day
+# TODO: Add idle timer pause toggle (if you don't want the timer to pause while idle)
 
 def get_phase():
     return state.current_phase
