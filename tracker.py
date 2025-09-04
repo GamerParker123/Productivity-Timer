@@ -2,7 +2,7 @@ import win32gui
 import win32process
 import psutil
 from datetime import datetime
-from logger import log_event, init_log, flush_buffer
+from logger import log_event, init_log, flush_buffer, maybe_compact
 import threading
 import time
 
@@ -17,11 +17,7 @@ def get_active_window_info():
     except Exception:
         return None, None
 
-def track_foreground(get_phase, is_unscheduled_func, stop_event, interval=1, flush_interval=10):
-    """
-    Tracks foreground app usage, logging time into hourly bins.
-    Automatically counts AFK/paused as unscheduled.
-    """
+def track_foreground(get_phase, is_unscheduled_func, stop_event, interval=1, flush_interval=30):
     init_log()
     last_app, last_title = get_active_window_info()
     last_phase = get_phase()
@@ -39,17 +35,15 @@ def track_foreground(get_phase, is_unscheduled_func, stop_event, interval=1, flu
             phase = "unscheduled"
 
         end_time = datetime.now()
-
-        # Log the interval
         if last_app and last_title:
             log_event(start_time, end_time, last_app, last_title, last_phase, paused=(phase=="unscheduled"))
 
         last_app, last_title, last_phase, start_time = app, title, phase, end_time
 
-        # Periodically flush buffered events to disk
+        # Periodic flush & rare compaction (both are quick now)
         if time.time() - last_flush >= flush_interval:
             flush_buffer()
+            maybe_compact()
             last_flush = time.time()
 
-    # Final flush on stop
     flush_buffer()

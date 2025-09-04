@@ -155,7 +155,6 @@ def show_kill_warning(root, pname):
     # keep it above the main window
     win.transient(root)
     win.grab_set()
-    root.wait_window(win)
 
 def start_gui(get_phase, get_afk, get_time_remaining, toggle_pause, is_unscheduled, get_overtime, set_phase, stop_event=None, root=None):
     if root is None:
@@ -491,31 +490,23 @@ def start_gui(get_phase, get_afk, get_time_remaining, toggle_pause, is_unschedul
             return
 
         if pie_update_counter % 60 == 0:
-            data = summarize_today() if view_var.get() == "daily" else summarize_week()
+            if view_var.get() == "daily":
+                stats = summarize_today()
+                top_apps, hourly_usage = app_usage_summary("daily")
+            else:
+                stats = summarize_week()
+                top_apps, hourly_usage = app_usage_summary("weekly")
 
-            # Pie chart
-            current_pie_canvas = update_pie_chart(data, chart_card)
-            # Stats text
-            stats = summarize_today() if view_var.get() == "daily" else summarize_week()
-
-            work_time = stats["work"]
-            break_time = stats["break"]
-            unscheduled_time = stats["unscheduled"]
-            cycles = stats["cycles"]
-
+            current_pie_canvas = update_pie_chart(dict(stats), chart_card)  # if update_pie_chart mutates, pass a copy
             stats_var.set(
                 f"{view_var.get().capitalize()} Summary:\n"
-                f"Work: {work_time // 60} min\n"
-                f"Break: {break_time // 60} min\n"
-                f"Unscheduled: {unscheduled_time // 60} min\n"
-                f"Cycles: {cycles:.1f}"
-            )
-
-            # App usage bar graph
-            top_apps, hourly_usage = (
-                app_usage_summary("daily") if view_var.get() == "daily" else app_usage_summary("weekly")
+                f"Work: {stats['work'] // 60} min\n"
+                f"Break: {stats['break'] // 60} min\n"
+                f"Unscheduled: {stats['unscheduled'] // 60} min\n"
+                f"Cycles: {stats['cycles']:.1f}"
             )
             current_bar_canvas = plot_hourly_usage(hourly_usage, top_apps, chart_card)
+
         pie_update_counter += 1
         after_id = root.after(1000, update_gui)
 

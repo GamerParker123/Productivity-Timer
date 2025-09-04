@@ -11,10 +11,17 @@ import os
 import tkinter as tk
 from tkinter import messagebox
 
+# TODO: Program breaks when you try to open a blocked app - fix
+# TODO: The program freezes randomly after a while of using
+# TODO: Add idle timer pause toggle (if you don't want the timer to pause while idle)
+
 current_pid = os.getpid()
 
+recent_warnings = set()
+WARNING_COOLDOWN = 5  # seconds
+last_warning_time = {}
+
 def enforce_blocked_apps(root):
-    """Kill any blocked apps if we're in a work phase."""
     if state.current_phase != "work":
         return
 
@@ -24,8 +31,13 @@ def enforce_blocked_apps(root):
             pname = (proc.info['name'] or "").lower()
             if pname in blocked and proc.info['pid'] != os.getpid():
                 proc.kill()
+
+                now = time.time()
                 if state.show_warnings:
-                    root.after(0, lambda p=pname: show_kill_warning(root, p))
+                    last = last_warning_time.get(pname, 0)
+                    if now - last > WARNING_COOLDOWN:
+                        last_warning_time[pname] = now
+                        root.after(0, lambda p=pname: show_kill_warning(root, p))
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             continue
 
@@ -34,8 +46,6 @@ def block_apps_loop(stop_event, root):
     while not stop_event.is_set():
         enforce_blocked_apps(root)
         time.sleep(1)
-
-# TODO: Add idle timer pause toggle (if you don't want the timer to pause while idle)
 
 def get_phase():
     return state.current_phase
@@ -79,7 +89,7 @@ if __name__ == "__main__":
         get_overtime=lambda: state.overtime,
         set_phase=lambda new_phase: setattr(state, 'current_phase', new_phase),
         stop_event=stop_event,
-        root=root  # <-- add this
+        root=root
     )
 
     # GUI closed → stop tracking
